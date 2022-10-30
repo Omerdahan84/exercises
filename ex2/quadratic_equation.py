@@ -1,3 +1,10 @@
+# FILE : quadratic_equation.py
+# WRITER : Omer Dahan , omerdahan , 315466664
+# EXERCISE : intro2cs1 ex2 2023
+# DESCRIPTION:This program gets from the user a coefficients of quadratic
+# equation and return to the user the solutions to that equation
+# Students I discussed with:
+# Websites I used:https://docs.python.org/3.4/library/stdtypes.html#str.split
 def quadratic_equation(a, b, c):
     """This function gets coefficients of a quadratic equation (where a 
     is the coefficient of x^2 and b is the coefficient of x and c is the free

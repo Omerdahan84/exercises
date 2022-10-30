@@ -1,3 +1,12 @@
+# FILE : shpes.py
+# WRITER : Omer Dahan , omerdahan , 315466664
+# EXERCISE : intro2cs1 ex2 2023
+# DESCRIPTION:This program ask the user to choose a shape he wants
+# to calculate it's area. After receiving the type of the shape
+# the function will wait to the values needed to calculate the shape 
+# area. The function will use the values and return the area of the shape
+# Students I discussed with:
+# Websites I used:
 #Importing the library math
 import math
 

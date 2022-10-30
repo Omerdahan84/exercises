@@ -1,3 +1,11 @@
+# FILE : temperature.py
+# WRITER : Omer Dahan , omerdahan , 315466664
+# EXERCISE : intro2cs1 ex2 2023
+# DESCRIPTION: This program gets thersold temperature and three 
+# measurements. The function will return True value if two out of
+# the three measurements are bigger than the threshold and false else
+# Students I discussed with:
+# Websites I used:
 def is_vormir_safe(threshold, measurement1, measurement2, measurement3):
     """"This function gerts 4 parametrs thresold and three measurements
      of different days. The function return true if at least two out

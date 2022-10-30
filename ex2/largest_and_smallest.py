@@ -1,10 +1,9 @@
 #################################################################
 # FILE : largest_and_smallest.py
 # WRITER : Omer Dahan , omerdahan , 315466664
-# EXERCISE : intro2cs1 ex1 2023
-# DESCRIPTION:This program gets a string from the user which represent
-#calculation with the signs {'+' ,'-' ,'*' ,':'}  and return 
-#the result of that caculation
+# EXERCISE : intro2cs1 ex2 2023
+# DESCRIPTION:This program gets three numbers and returns the biggest
+# and the smallest one
 #################################################################
 #I choose test 4 to be equal to (-11,-5,0) to see that the function
 #is good to special number (negative,float,zero)
