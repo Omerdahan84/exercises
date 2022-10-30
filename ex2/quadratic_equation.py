@@ -24,8 +24,10 @@ def quadratic_equation(a, b, c):
         sol_2 = (-b - (discriminant ** 0.5)) / 2*a
         #return the values of both solutions
     return sol_1,sol_2
+def quadratic_equation_user_input():
+    user_input = int(input("Insert coefficients a, b, and c: "))
 
 
 if __name__ == '__main__':
-    print(quadratic_equation(-1, -5, 10))
+    quadratic_equation_user_input()
 
