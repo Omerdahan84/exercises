@@ -1,3 +1,11 @@
+#################################################################
+# FILE : largest_and_smallest.py
+# WRITER : Omer Dahan , omerdahan , 315466664
+# EXERCISE : intro2cs1 ex1 2023
+# DESCRIPTION:This program gets a string from the user which represent
+#calculation with the signs {'+' ,'-' ,'*' ,':'}  and return 
+#the result of that caculation
+#################################################################
 #I choose test 4 to be equal to (-11,-5,0) to see that the function
 #is good to special number (negative,float,zero)
 # I choose test 5 to be equal to (0, 5.4, 5.4) to check the case 
