@@ -15,22 +15,22 @@ def shape_area():
         #storing the value of the radius of the circle
         #it's necessary to cast the input because it's type is str
         #which not allow numeric calculations
-        radius = float(input(("Insert the radius of the circle: ")))
+        radius = float(input())
         #returns the area of a circle according to circle area formula
         return math.pi * radius**2
     #Checks if the inputs is equal to '2'
     elif user_input == '2':
         #storing the values of the sides of the trctangle 
         #necessary to cast - same reason as before
-        first_side = float(input(("Insert the first side of the rectangle: ")))
-        second_side = float(input(("Insert the second side of the rectangle: ")))
+        first_side = float(input())
+        second_side = float(input())
         #returns and calculates the area according to the formula
         return first_side * second_side
     #check if user input is equal to 3
     elif user_input == '3':
         #storing the value of the side of the triangle
         #casting for the same reason as the first condition
-        side = float(input(("Insert the side of the triangle: ")))
+        side = float(input())
         #return the value of area according to the formula of triangle
         #with equal sides
         return (3**0.5 / 4) * side**2

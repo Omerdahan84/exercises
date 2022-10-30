@@ -51,7 +51,7 @@ def quadratic_equation_user_input():
         #This condition checks if both of the solutions has numeric
         #values in that case it will print to the user the two solutions
         if sol_1 != None and sol_2 != None:
-            print('The equation has 2 sulotions: ' + str(sol_1) +' and ' + str(sol_2))
+            print('The equation has 2 solutions: ' + str(sol_1) +' and ' + str(sol_2))
         #This section checks if one of the solutions is None, wich means that the equation has
         #one solution, in this case the function will print to the user the 1 solution
         elif sol_1 == None and sol_2 != None:

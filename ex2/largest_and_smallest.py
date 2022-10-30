@@ -24,7 +24,7 @@ def largest_and_smallest(n1, n2, n3):
     if n3 < min_val:
         min_val = n3
     return max_val,min_val
-def check_largest_and_smallert():
+def check_largest_and_smallest():
     """This function test the function largest_and_smallest
     the function runs the largest_and_smallest function and
     return True If the returned values are equal to the values 
