@@ -1,1 +1,2 @@
-# This repo includes exercises from intro2cs 2022
+#exercises
+This repo includes exercises from intro2cs 2022
