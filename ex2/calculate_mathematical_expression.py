@@ -15,12 +15,11 @@ def calculate_mathematical_expression(n1, n2, operator):
         return n1* n2
     #If operato is colon, the function will return the division of the
     #the first number by the second
+    #if the number n2 is equal to zero the function will return none Value for
+    #division
     elif operator == ':' and n2 != 0:
         return n1/n2
     else:
+        #If the operator is not any of {'+' ,'-' ,'*' ,':'} the
+        #function will return None
         return None
-    
-
-if  __name__ == '__main__':
-    for i in range(-10,10):
-        print (i,i+5,calculate_mathematical_expression(i, i+5, ':'))
