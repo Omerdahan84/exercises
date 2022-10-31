@@ -12,6 +12,4 @@ def shape_area():
     elif user_input == '3':
         side = float(input(("Insert the side of the triangle: ")))
         return (3**0.5 / 4) * side**2
-if __name__ == '__main__':
-    print(shape_area())
 
