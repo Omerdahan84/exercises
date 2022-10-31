@@ -86,6 +86,5 @@ def check_largest_and_smallert():
                 else:
                     #If all test passed return true
                     return True
-if __name__== '__main__':
-    print(check_largest_and_smallert())
+
 
