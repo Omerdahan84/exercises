@@ -70,8 +70,8 @@ def quadratic_equation_user_input():
         # the function will print it to the user
         else:
             print('The equation has no solutions')
-
-if __name__ == '__main__':
-    inp = ''
-    while inp != "end":
-        quadratic_equation_user_input()
+print(
+ quadratic_equation(1, 1.5, -1) == (0.5, -2),
+ quadratic_equation(1, -8, 16) == (4, None),
+ quadratic_equation(1, -2, 34.5) == (None, None),
+ quadratic_equation(4, -12, 9) == (3/2, None))

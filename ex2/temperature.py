@@ -31,3 +31,8 @@ def is_vormir_safe(threshold, measurement1, measurement2, measurement3):
         # If all three condition are false the function will return
         # false
         return False
+print(is_vormir_safe(26, 38, 90, 20) is True,
+ is_vormir_safe(10, 10, 10, 10) is False,
+ is_vormir_safe(10, 11, 10, 11) is True,
+ is_vormir_safe(-1, -9, 0, 1) is True,
+ is_vormir_safe(0, 90, 0, 1) is True)

@@ -93,5 +93,3 @@ def check_largest_and_smallest():
                 else:
                     # If all test passed return true
                     return True
-
-
