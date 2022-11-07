@@ -94,15 +94,17 @@ def monotonicity_inverse(def_bool):
 
     """This function gets a list of sequence defenitions and 
     returns a list the fits to the definition if """
-    # Checks if the definition ask for a sequence that goes up 
+    # Checks if the defisnition ask for a sequence that goes up 
     # and down in the same time or all
     # definition equal to false and returns None if true
     if (def_bool[0] == True or def_bool[1] == True) and\
-    (def_bool[2] == True or def_bool[3] == True) or\
-    (def_bool == [False, False, False, False]):
+    (def_bool[2] == True or def_bool[3] == True) and\
+        def_bool != [True, False, True, False]:
         return None
     # checks the definition and return a list that fit
     # to each one
+    if def_bool[0] == True and def_bool[2] == True:
+        return [1, 1, 1, 1]
     if def_bool[0] == True and def_bool[1] == True:
         return [1, 2, 3, 4]
     if def_bool[0] == True and def_bool[1] == False: 
@@ -111,7 +113,8 @@ def monotonicity_inverse(def_bool):
         return [4, 3, 2, 1]
     if def_bool[2] == True and def_bool[3] == False:
         return [4, 3, 2, 2]
-
+    if def_bool == [False, False, False, False]:
+        return [0,-1,1,-1]
 def convolve(mat):
     """This function gets a matrix and return a matrix which each index
     is the sum of 3x3 sub matrix of the input matrix"""
@@ -149,7 +152,7 @@ def sum_of_vectors(vec_lst):
     # Checks if the vectros are not empty
     for i in range(len(vec_lst)):
         if len(vec_lst[i]) == 0:
-            return None
+            return []
     sum_v = [] # Initializing the vectors of the sums
     sum = 0 # Initializing sum 
     j = 0  # Initializing j 
@@ -175,7 +178,3 @@ def num_of_orthogonal(vectors):
                 count += 1
     return count
 
-assert(convolve([[1, 1, 1, 1, 0], [1, 1, 0, 0, 0], [0, 0, 1, 0, 1], [0.5, 0, 0, 1, 0]]) == [[6, 5, 4], [3.5, 3, 3]])
-assert(convolve ([[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 1, 0], [0.5, 0, 0, 1], [2, 0, 0, 0]]) == [[6.0, 5.0], [3.5, 3.0], [3.5, 2.0]])
-assert(convolve ([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]) == [[9, 9], [9, 9]])
-assert(convolve ([[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 0]]) == [[9], [8]])
