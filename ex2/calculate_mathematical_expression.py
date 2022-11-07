@@ -40,13 +40,4 @@ def calculate_from_string(string_to_calc):
     # l[0],l[2] are the numbers obtained from the function split and the opreator is
     # l[1]
     return calculate_mathematical_expression(float(l[0]), float(l[2]), str(l[1]))
-print( calculate_from_string("10 : 2") == 5.0,
- calculate_from_string("10 : -2") == -5.0,
- calculate_from_string("-10 : -2") == 5.0,
-calculate_from_string("-10 : 2") == -5.0,
- calculate_from_string("10 + 2") == 12.0,
- calculate_from_string("100 - 39.3") == 60.7,
- calculate_from_string("5 : 2") == 2.5,
- calculate_from_string("5 : 0") is None,
- calculate_from_string("10 333 2") is None,
- calculate_from_string("10 ^ 2") is None)
+

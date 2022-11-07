@@ -90,12 +90,19 @@ def sequence_monotonicity(sequence):
             break    
     return list_of_definitions
 
-def monotonicity_inverse(def_bool): 
+def monotonicity_inverse(def_bool):
+
+    """This function gets a list of sequence defenitions and 
+    returns a list the fits to the definition if """
+    # Checks if the definition ask for a sequence that goes up 
+    # and down in the same time or all
+    # definition equal to false and returns None if true
     if (def_bool[0] == True or def_bool[1] == True) and\
     (def_bool[2] == True or def_bool[3] == True) or\
     (def_bool == [False, False, False, False]):
         return None
-
+    # checks the definition and return a list that fit
+    # to each one
     if def_bool[0] == True and def_bool[1] == True:
         return [1, 2, 3, 4]
     if def_bool[0] == True and def_bool[1] == False: 
@@ -104,5 +111,52 @@ def monotonicity_inverse(def_bool):
         return [4, 3, 2, 1]
     if def_bool[2] == True and def_bool[3] == False:
         return [4, 3, 2, 2]
-bool_def = [False, True, False, False]
-print(monotonicity_inverse(bool_def) is None)
+
+def convolve(mat):
+    LENGTH_MAT = len(mat)
+    if LENGTH_MAT == 0:
+        return None
+    sum = 0
+    table = []
+    for i in range(LENGTH_MAT):
+        row = []
+        for j in range(len(mat[i])):
+            sum = 0
+            for x in range(-1,3):
+                for y in range(-1,3):
+                    current_x = i + x
+                    current_y = j + y
+                    if current_x < 0 or current_x > LENGTH_MAT-1\
+                    or current_y < 0 or current_y > len(mat[i])-1:
+                        continue
+                    sum += mat[current_x][current_y]
+            row.append(sum)
+        table.append(row)
+    return table 
+
+def sum_of_vectors(vec_lst):
+    """This function gets a list of lists represent vectors and gives back
+    the some of all of this vectors"""
+    # Checks if there are no vectors
+    if len(vec_lst) == 0:
+        return None
+    # Checks if the vectros are not empty
+    for i in range(len(vec_lst)):
+        if len(vec_lst[i]) == 0:
+            return None
+    sum_v = [] # Initializing the vectors of the sums
+    sum = 0 # Initializing sum 
+    j = 0  # Initializing j 
+    # This block going over the cloumns of the matrix
+    # to give back the sum
+    for i in range (len(vec_lst[j])):
+        sum = 0
+        for j in range(len(vec_lst)):
+            sum  += vec_lst[j][i]
+        sum_v.append(sum)
+    return sum_v
+assert sum_of_vectors([[1, 1], [1, 3]])
+
+assert sum_of_vectors([[1, 1, 1], [1, 0, 0], [0, 0, 100]]) 
+
+assert sum_of_vectors([[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]])
