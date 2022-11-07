@@ -113,22 +113,28 @@ def monotonicity_inverse(def_bool):
         return [4, 3, 2, 2]
 
 def convolve(mat):
-    LENGTH_MAT = len(mat)
-    if LENGTH_MAT == 0:
+    """This function gets a matrix and return a matrix which each index
+    is the sum of 3x3 sub matrix of the input matrix"""
+    LENGTH_MAT = len(mat) # initializing constant to be equal to the len of mat
+    if LENGTH_MAT == 0: # If matrix is empty returns None
         return None
     sum = 0
-    table = []
+    table = []# initializing empty matrix for the sums
+    # Go over the indexes of the matrix and sum the 3x3 matrixes
     for i in range(LENGTH_MAT):
-        row = []
+        if i + 2 >= LENGTH_MAT:# Checks if we have three index from right side
+            break
+        row=[] # Creating new row 
         for j in range(len(mat[i])):
-            sum = 0
-            for x in range(-1,3):
-                for y in range(-1,3):
+            if j + 2 >= len(mat[i]):# Checks if we have three index from 
+                                    # the bottom
+                break
+            sum = 0 # initializing sum
+            # This block sums the indexes of the sub matrix
+            for x in range(0,3):
+                for y in range(0,3):
                     current_x = i + x
                     current_y = j + y
-                    if current_x < 0 or current_x > LENGTH_MAT-1\
-                    or current_y < 0 or current_y > len(mat[i])-1:
-                        continue
                     sum += mat[current_x][current_y]
             row.append(sum)
         table.append(row)
@@ -155,8 +161,21 @@ def sum_of_vectors(vec_lst):
             sum  += vec_lst[j][i]
         sum_v.append(sum)
     return sum_v
-assert sum_of_vectors([[1, 1], [1, 3]])
 
-assert sum_of_vectors([[1, 1, 1], [1, 0, 0], [0, 0, 100]]) 
+def num_of_orthogonal(vectors):
+    """This function get a list of vectors and return the count of the 
+    vectors that are orthogonal to each other"""
+    count = 0 # initializing count
+    # This list goes over the vectors list and check if the inner products are
+    # equal to zero to determine if they are orthogonal
+    for i in range(len(vectors)):
+        for j in range(i+1, len(vectors)): # Starting this loop at i+1 to 
+                                           # to prevent double count
+            if inner_product(vectors[i], vectors[j]) == 0:
+                count += 1
+    return count
 
-assert sum_of_vectors([[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]])
+assert(convolve([[1, 1, 1, 1, 0], [1, 1, 0, 0, 0], [0, 0, 1, 0, 1], [0.5, 0, 0, 1, 0]]) == [[6, 5, 4], [3.5, 3, 3]])
+assert(convolve ([[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 1, 0], [0.5, 0, 0, 1], [2, 0, 0, 0]]) == [[6.0, 5.0], [3.5, 3.0], [3.5, 2.0]])
+assert(convolve ([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]) == [[9, 9], [9, 9]])
+assert(convolve ([[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 0]]) == [[9], [8]])
