@@ -91,30 +91,25 @@ def sequence_monotonicity(sequence):
     return list_of_definitions
 
 def monotonicity_inverse(def_bool):
-
     """This function gets a list of sequence defenitions and 
     returns a list the fits to the definition if """
-    # Checks if the defisnition ask for a sequence that goes up 
-    # and down in the same time or all
-    # definition equal to false and returns None if true
-    if (def_bool[0] == True or def_bool[1] == True) and\
-    (def_bool[2] == True or def_bool[3] == True) and\
-        def_bool != [True, False, True, False]:
+    # Checks if any one if possible cases happned 
+    # else return none
+    if def_bool == [True, False, False, False]:
+        return[1, 1, 3, 4]
+    elif def_bool == [False, False, True, False]:
+        return [4, 4, 2, 1]
+    elif def_bool == [True, False, True, False]:
+        return [1,1,1,1]
+    elif def_bool == [True, True, False, False]:
+        return[1,2,3,4]
+    elif def_bool == [False, False, True, True]:
+        return [4,3,2,1]
+    elif def_bool == [False, False, False, False]:
+        return [-1,1,2,1]
+    else:
         return None
-    # checks the definition and return a list that fit
-    # to each one
-    if def_bool[0] == True and def_bool[2] == True:
-        return [1, 1, 1, 1]
-    if def_bool[0] == True and def_bool[1] == True:
-        return [1, 2, 3, 4]
-    if def_bool[0] == True and def_bool[1] == False: 
-        return [1, 1, 3, 4]   
-    if def_bool[2] == True and def_bool[3] == True:
-        return [4, 3, 2, 1]
-    if def_bool[2] == True and def_bool[3] == False:
-        return [4, 3, 2, 2]
-    if def_bool == [False, False, False, False]:
-        return [0,-1,1,-1]
+
 def convolve(mat):
     """This function gets a matrix and return a matrix which each index
     is the sum of 3x3 sub matrix of the input matrix"""
@@ -124,14 +119,11 @@ def convolve(mat):
     sum = 0
     table = []# initializing empty matrix for the sums
     # Go over the indexes of the matrix and sum the 3x3 matrixes
-    for i in range(LENGTH_MAT):
-        if i + 2 >= LENGTH_MAT:# Checks if we have three index from right side
-            break
+    # Stops two steps before bottom edege to stay in range
+    for i in range(LENGTH_MAT - 2):
         row=[] # Creating new row 
-        for j in range(len(mat[i])):
-            if j + 2 >= len(mat[i]):# Checks if we have three index from 
-                                    # the bottom
-                break
+        # Stops two steps before right edege to stay in range
+        for j in range(len(mat[i]) - 2):
             sum = 0 # initializing sum
             # This block sums the indexes of the sub matrix
             for x in range(0,3):
