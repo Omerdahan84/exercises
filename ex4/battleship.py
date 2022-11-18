@@ -86,10 +86,10 @@ def check_avalibale_spots(board):
                 lst.append(loc)
     return lst
 
-def  create_computer_board(player_board, rows = helper.NUM_ROWS, \
+def create_computer_board(player_board, rows = helper.NUM_ROWS, \
     columns = helper.NUM_COLUMNS, ship_sizes = helper.SHIP_SIZES):
-    """This function gets the player board and chhose a place to put 
-    submarines"""
+    """Gets the player board and chhose a place to put 
+    submarines for the computer"""
     free_spots = check_avalibale_spots(player_board)
     board = init_board(rows, columns)
     # Going over the tuple of ship sizes
@@ -100,36 +100,85 @@ def  create_computer_board(player_board, rows = helper.NUM_ROWS, \
             cell = helper.choose_ship_location(board, size, free_spots)
             row = cell[0]
             col = cell[1]
-            if valid_ship(player_board, size, cell) == False:
-                continue
-            else:
+            if valid_ship(player_board, size, cell) == True and \
+                valid_ship(board, size, cell) == True:
                 for i in range(size):
                     board[row + i][col] = helper.SHIP
-            break
+                break
+            else:
+                continue
+
     return board
-    
+
 def fire_torpedo(board, loc):
     """This function gets a board and a location to fire torpado
     and return the result of the hit"""
     row = loc[0]
     col = loc[1]
+    if check_row_col(row, col) == False or  \
+        board[row][col] == helper.HIT_WATER\
+        or  board[row][col] == helper.HIT_SHIP:
+        return board
     if board[row][col] == helper.SHIP:
-        i = 0
-        while board[row + i][col] == helper.SHIP:
-                board[row+ i ][col] = helper.HIT_SHIP
-                i += 1
+        board[row][col] = helper.HIT_SHIP
     else:
         board[row][col] = helper.HIT_WATER
     return board
     
+def count_hit_ships(board):
+    """This function get a board and return the number of ships that got hit"""
+    count = 0
+    for row in board:
+        for item in row:
+            if item == helper.HIT_SHIP:
+                count += 1
+    return count
+
+def turpedo_spots(board):
+    """This function gets the player board and return a list of tuples, 
+    each tuple represent avalibalse spot to shot turpedo"""
+    lst = []
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] != helper.HIT_SHIP or\
+                board[i][j] != helper.HIT_WATER:
+                loc = (i, j)
+                lst.append(loc)
+    return lst
+
 def main():
     player_board = create_player_board()
-    lst = check_avalibale_spots(player_board)
+    lst_allowed_values = check_avalibale_spots(player_board)
     computer_board = create_computer_board(player_board)
-    helper.print_board(player_board, computer_board)
-    for item in lst:
-        if player_board[item[0]][item[1]] == helper.SHIP:
-            print("false")
+    deme_board = init_board()
+    turn = 0 
+    while True:
+        lst_allowed_values_turpedo = turpedo_spots(player_board)
+        if turn % 2 == 0:
+            print("This is yout turn!")
+            while True:
+                helper.print_board(player_board,deme_board)
+                #helper.print_board(player_board,computer_board)
+                hit = helper.get_input("Enter a location to send a turpedo\
+ into: ")
+                if cell_loc(hit) == None:
+                    print("The location you choosed is invalid, please try\
+ again. ")
+                else:
+                    loc = cell_loc(hit)
+                    computer_board =  fire_torpedo(computer_board,loc)
+                    deme_board[loc[0]][loc[1]] = computer_board[loc[0]][loc[1]]
+                    turn += 1
+                    break
+        if turn % 2 != 0:
+                while True:
+                    print("This is the computer turn")
+                    hit = helper.choose_torpedo_target(player_board,lst_allowed_values_turpedo)
+                    player_board = fire_torpedo(player_board, hit)
+                    helper.print_board(player_board,deme_board)
+                    turn += 1
+                    break
+
             
 
 if __name__ == "__main__":
