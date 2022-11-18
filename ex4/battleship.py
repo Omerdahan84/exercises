@@ -22,6 +22,8 @@ def cell_loc(name):
     """This function gets a string represent a location in the board and
     return the tuple that fits to that location in the board matrix"""
     # Checks if the first value of the string is alphabetic
+    if name not in range(2,4):
+        return None
     if name[0].isalpha() == False:
         return None
     else:
@@ -79,6 +81,7 @@ def check_avalibale_spots(board):
     """This function gets the player board and return a list of tuples, 
     each tuple represent avalibalse spot"""
     lst = []
+
     for i in range(len(board)):
         for j in range(len(board[i])):
             if board[i][j] == helper.WATER:
@@ -125,14 +128,14 @@ def fire_torpedo(board, loc):
         board[row][col] = helper.HIT_WATER
     return board
     
-def count_hit_ships(board):
+def finish_game(board):
     """This function get a board and return the number of ships that got hit"""
     count = 0
     for row in board:
         for item in row:
-            if item == helper.HIT_SHIP:
-                count += 1
-    return count
+            if item == helper.SHIP:
+                return False
+    return True
 
 def turpedo_spots(board):
     """This function gets the player board and return a list of tuples, 
