@@ -22,8 +22,8 @@ def cell_loc(name):
     """This function gets a string represent a location in the board and
     return the tuple that fits to that location in the board matrix"""
     # Checks if the first value of the string is alphabetic
-    if name not in range(2,4):
-        return None
+    #if name not in range(2,4):
+        #return None
     if name[0].isalpha() == False:
         return None
     else:
@@ -128,9 +128,10 @@ def fire_torpedo(board, loc):
         board[row][col] = helper.HIT_WATER
     return board
     
-def finish_game(board):
-    """This function get a board and return the number of ships that got hit"""
-    count = 0
+def game_finished(board):
+    """Checks if thera are ships in the board
+    to detemine if the game finished"""
+
     for row in board:
         for item in row:
             if item == helper.SHIP:
@@ -143,46 +144,93 @@ def turpedo_spots(board):
     lst = []
     for i in range(len(board)):
         for j in range(len(board[i])):
-            if board[i][j] != helper.HIT_SHIP or\
+            if board[i][j] != helper.HIT_SHIP and\
                 board[i][j] != helper.HIT_WATER:
                 loc = (i, j)
                 lst.append(loc)
     return lst
 
+def set_hidden_board(computer_board):
+    """Gets the computer board and returns an hidden board. represen ships as 
+    water."""
+    hidden_board = init_board(len (computer_board), len(computer_board[0]))
+    for i in range(len(computer_board)):
+        for j in range(len(computer_board[i])):
+            if computer_board[i][j] != helper.SHIP:
+                hidden_board[i][j] = computer_board[i][j]
+            else:
+                hidden_board[i][j] = helper.WATER
+    return hidden_board
+
 def main():
+    print('-----------------------------')
+    print('=====This is BATTLESHIPS=====')
+    print("     let's set the board")
+    print('-----------------------------')
     player_board = create_player_board()
     lst_allowed_values = check_avalibale_spots(player_board)
     computer_board = create_computer_board(player_board)
-    deme_board = init_board()
     turn = 0 
-    while True:
-        lst_allowed_values_turpedo = turpedo_spots(player_board)
-        if turn % 2 == 0:
-            print("This is yout turn!")
+    run_game = True
+    while run_game:
+        hidden_board = set_hidden_board(computer_board)
+        
+        
+        if game_finished(player_board):
+
+         helper.print_board(player_board, computer_board)
+
+         while True:
+            another_round = helper.get_input("The computer won, would you like to play another\
+ round?('Y'=yes, 'N' = no): ")
+            if another_round != 'Y' and another_round != 'N':
+                print("You choosed invalid input")
+                continue
+            elif another_round == 'N':
+                run_game = False
+                break
+            if another_round == 'Y':
+                main()   
+        elif game_finished(computer_board):
+            helper.print_board(player_board, computer_board)
             while True:
-                helper.print_board(player_board,deme_board)
-                #helper.print_board(player_board,computer_board)
-                hit = helper.get_input("Enter a location to send a turpedo\
- into: ")
-                if cell_loc(hit) == None:
-                    print("The location you choosed is invalid, please try\
- again. ")
-                else:
-                    loc = cell_loc(hit)
-                    computer_board =  fire_torpedo(computer_board,loc)
-                    deme_board[loc[0]][loc[1]] = computer_board[loc[0]][loc[1]]
-                    turn += 1
+                another_round = helper.get_input("You won, would you like to play another\
+ round?('Y'=yes, 'N' = no): ")
+                if another_round != 'Y' and another_round != 'N':
+                    print("You choosed invalid input")
+                    continue
+                elif another_round == 'N':
+                    run_game = False
                     break
-        if turn % 2 != 0:
+                if another_round == 'Y':
+                    main()   
+               
+
+        while not game_finished(computer_board) and not game_finished(computer_board):
+            hidden_board = set_hidden_board(computer_board)
+            lst_allowed_values_turpedo = turpedo_spots(player_board)
+            helper.print_board(player_board,hidden_board)
+            helper.print_board(player_board,computer_board)
+            if turn % 2 == 0:                
                 while True:
-                    print("This is the computer turn")
+                    hit = helper.get_input("Enter a location to send a turpedo\
+ into: ")
+                    if cell_loc(hit) == None:
+                        print("The location you choosed is invalid, please try\
+ again. ")
+                    else:
+                        loc = cell_loc(hit)
+                        computer_board =  fire_torpedo(computer_board,loc)
+                        turn += 1
+                        break
+            if turn % 2 != 0:
+                while True:  
                     hit = helper.choose_torpedo_target(player_board,lst_allowed_values_turpedo)
                     player_board = fire_torpedo(player_board, hit)
-                    helper.print_board(player_board,deme_board)
                     turn += 1
                     break
-
-            
+                    
+    
 
 if __name__ == "__main__":
     main()
