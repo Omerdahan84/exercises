@@ -62,7 +62,7 @@ def combine_channels(channels: List[SingleChannelImage]) -> ColoredImage:
     # [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
     # [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]))
 
-#print(combine_channels([[[1]], [[2]]]))
+# print(combine_channels([[[1]], [[2]]]))
 
 
 def RGB2grayscale(colored_image: ColoredImage) -> SingleChannelImage:
@@ -93,39 +93,58 @@ def blur_kernel(size: int) -> Kernel:
     return Kernel
 
 
-def in_bounds(heigth, width, current_row, curren_col):
+def in_bounds(width, height, current_row, current_col, margin):
     """check if a given locatin is in bound of matrix"""
-    if current_row < 0 or current_row >= width or curren_col < 0 or curren_col >= heigth:
+    if current_row - margin < 0 or current_col - margin < 0 or current_col + margin >= height or\
+            current_row + margin >= width:
         return False
     return True
 
 
+def mult(i, j, margin, image, kernel):
+    """multuply kernel to matrix"""
+    sum = 0
+    kerenl_row = 0
+    kerenl_col = 0
+    def_val = image[i][j]
+    for r in range(i-margin, i+margin+1):
+        kerenl_col = 0
+        for c in range(j-margin, j+margin+1):
+            if r < 0 or r >= len(image) or c < 0 or c >= len(image[0]):
+                sum += def_val*kernel[kerenl_row][kerenl_col]
+            else:
+                sum += image[r][c] * kernel[kerenl_row][kerenl_col]
+            kerenl_col += 1
+        kerenl_row += 1
+    return sum
+
+
+def apply_kernel(image: SingleChannelImage, kernel: Kernel) -> SingleChannelImage:
+    image_height = len(image)
+    image_width = len(image[0])
+    kernel_size = len(kernel)
+    margin = kernel_size // 2
+    img_kernel = []
+    for i in range(image_height):
+        row_kernel = []
+        for j in range(image_width):
+            if in_bounds(image_width, image_height, i, j, margin):
+                sum = mult(i, j, margin, image, kernel)
+                row_kernel.append(check_kerenel_value(sum))
+            else:
+                sum = mult(i, j, margin, image, kernel)
+                row_kernel.append(check_kerenel_value(sum))
+        img_kernel.append(row_kernel)
+    return img_kernel
+
+
 def check_kerenel_value(value):
+    """making the kernel value round and between 0 to 255"""
     if value > 255:
         return 255
     if value < 0:
         return 0
-    return value
-
-
-def apply_kernel(image: SingleChannelImage, kernel: Kernel) -> SingleChannelImage:
-    height_image = len(image)
-    width_image = len(image[0])
-    size_kernel = len(kernel)
-    img_blur = []
-    for i in range(height_image):
-        row_blur = []
-        for j in range(width_image):
-            sum = 0
-            for k in range(size_kernel):
-                for m in range(size_kernel):
-                    if not in_bounds(height_image, width_image,  j + m, i + k):
-                        sum += image[i][j]*kernel[k][m]
-                    else:
-                        sum += image[i + k][j + m]*kernel[k][m]
-            row_blur.append(round(check_kerenel_value(sum)))
-        img_blur.append(row_blur)
-    return img_blur
+    return round(value)
 
 
 print(apply_kernel([[0, 1, 2, 0, 1], [1, 2, 2, 0, 0], [0, 1, 2, 1, 0], [
