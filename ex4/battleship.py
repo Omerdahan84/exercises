@@ -10,10 +10,12 @@ def init_board(rows=helper.NUM_ROWS, columns=helper.NUM_COLUMNS):
     return board
 
 
-def check_row_col(row, col):
+def check_row_col(row, col, board):
     """ This funcion checks if the rows or columns of specific
     cell are in the board"""
-    if row >= helper.NUM_ROWS or row < 0 or col >= helper.NUM_COLUMNS or \
+    if row > 99 or col > 26:
+        return False
+    if row >= len(board) or row < 0 or col >= len(board[0]) or \
             col < 0:
         return False
     else:
@@ -36,11 +38,8 @@ def cell_loc(name):
             if helper.is_int(name[i]) == False:
                 return None
     column = name[0].upper()
-    row = name[1:]
     row = int(name[1:]) - 1
     column = (ord(column) % 65)
-    if check_row_col(row, column) == False:
-        return None
     return row, column
 
 
@@ -49,7 +48,7 @@ def valid_ship(board, size, loc):
     the start of the ship and return if its possible to put it in the board"""
     row = loc[0]
     col = loc[1]
-    if row + size > helper.NUM_ROWS:
+    if row + size > len(board):
         return False
     for i in range(size):
         if board[row + i][col] == helper.SHIP:
@@ -72,7 +71,10 @@ def create_player_board(rows=helper.NUM_ROWS,
 ship of size {size}: ')
             loc = cell_loc(user_input)
             if loc == None:
-                print("Invalid location")
+                print("Invalid Format")
+                continue
+            if check_row_col(loc[0], loc[1], board) is False:
+                print("Location is out of bounds")
                 continue
             if valid_ship(board, size, loc) == False:
                 print("Invalid location")
@@ -125,7 +127,7 @@ def fire_torpedo(board, loc):
     and return the result of the hit"""
     row = loc[0]
     col = loc[1]
-    if check_row_col(row, col) == False or  \
+    if check_row_col(row, col, board) == False or  \
             board[row][col] == helper.HIT_WATER\
             or board[row][col] == helper.HIT_SHIP:
         return board
@@ -174,62 +176,81 @@ def set_hidden_board(computer_board):
 
 def main():
     """Runs the game"""
-    player_board = create_player_board()  # Creating the user board
-    computer_board = create_computer_board()  # Creating the computer board
-    hidden_board = set_hidden_board(
-        computer_board)  # Hiding the computer ships
-    run_game = True  # Boolean value to running the game
-    # Loops until game over
-    while run_game:
-        hidden_board = set_hidden_board(computer_board)
-        helper.print_board(player_board, hidden_board)
-        # The player move
-        while True:
-            hit = helper.get_input("Enter a target to hit: ")
-            if cell_loc(hit) == None:
-                print("Invalid target or format")
-            else:
-                loc = cell_loc(hit)
-                if computer_board[loc[0]][loc[1]] == helper.HIT_WATER\
-                        or computer_board[loc[0]][loc[1]] == helper.HIT_SHIP:
-                    print("You already choosed this location.")
+    play = 'Y'
+    while play == 'Y':
+        player_board = create_player_board(
+        )  # Creating the user board
+        computer_board = create_computer_board(
+        )  # Creating the computer board
+        hidden_board = set_hidden_board(
+            computer_board)  # Hiding the computer ships
+        run_game = True  # Boolean value to running the game
+        # Loops until game over
+        while run_game:
+            # The player move
+            while True:
+                hidden_board = set_hidden_board(computer_board)
+                helper.print_board(player_board, hidden_board)
+                hit = helper.get_input("Enter a target to hit: ")
+                if cell_loc(hit) == None:
+                    print("Invalid format")
                     continue
                 else:
-                    fire_torpedo(computer_board, loc)
-                    break
-        # The computer move
-        while True:
-            player_hidden = set_hidden_board(player_board)
-            lst_turpedo = turpedo_spots(player_hidden)
-            hit = helper.choose_torpedo_target(player_hidden, lst_turpedo)
-            fire_torpedo(player_board, hit)
-            break
-        # Checks if all of the player ships destroyes
-        if game_finished(player_board):
-            helper.print_board(player_board, computer_board)
-            # take input to check if the user wants to play another round
-            while True:
-                another_round = helper.get_input("The computer won, would you \
+                    loc = cell_loc(hit)
+                    if check_row_col(loc[0], loc[1], computer_board) == False:
+                        print("location out of bounds")
+                        continue
+                    if computer_board[loc[0]][loc[1]] == helper.HIT_WATER\
+                            or computer_board[loc[0]][loc[1]] == helper.HIT_SHIP:
+                        print("You already choosed this location.")
+                        continue
+                    else:
+                        fire_torpedo(computer_board, loc)
+                # The computer move
+
+                player_hidden = set_hidden_board(player_board)
+                lst_turpedo = turpedo_spots(player_hidden)
+                hit = helper.choose_torpedo_target(player_hidden, lst_turpedo)
+                fire_torpedo(player_board, hit)
+                break
+
+            # Checks if it's a tie
+            if game_finished(player_board) and game_finished(computer_board):
+                helper.print_board(player_board, computer_board)
+                # take input to check if the user wants to play another round
+                while True:
+                    answer = helper.get_input("It's a tie, would you \
 like to play another round ('Y' = yes, 'N' = no): ")
-                if another_round != 'Y' and another_round != 'N':
-                    print("invalid answer")
-                else:
-                    run_game = False
-                    break
-        # if the computer loses
-        elif game_finished(computer_board):
-            helper.print_board(player_board, computer_board)
-            # take input to check if the user wants to play another round
-            while True:
-                another_round = helper.get_input("you are the winner, would you \
+                    if answer != 'Y' and answer != 'N':
+                        print("invalid answer")
+                    else:
+                        run_game = False
+                        break
+            # if the computer loses
+            elif game_finished(computer_board):
+                helper.print_board(player_board, computer_board)
+                # take input to check if the user wants to play another round
+                while True:
+                    answer = helper.get_input("you are the winner, would you \
 like to play another round ('Y' = yes, 'N' = no): ")
-                if another_round != 'Y' and another_round != 'N':
-                    print("invalid answer")
-                else:
-                    run_game = False
-                    break
-    if another_round == 'Y':
-        main()
+                    if answer != 'Y' and answer != 'N':
+                        print("invalid answer")
+                    else:
+                        run_game = False
+                        break
+             # Checks if the player wins
+            elif game_finished(player_board):
+                helper.print_board(player_board, computer_board)
+                # take input to check if the user wants to play another round
+                while True:
+                    answer = helper.get_input("The computer won, would you \
+like to play another round ('Y' = yes, 'N' = no): ")
+                    if answer != 'Y' and answer != 'N':
+                        print("invalid answer")
+                    else:
+                        run_game = False
+                        break
+        play = answer
 
 
 if __name__ == "__main__":
