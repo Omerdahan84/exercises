@@ -43,26 +43,25 @@ def separate_channels(image: ColoredImage) -> List[SingleChannelImage]:
 def combine_channels(channels: List[SingleChannelImage]) -> ColoredImage:
     "Take a list of one channel images and combine it to one channle"
     colored_image = []
-    for i in range(len(channels)):
+    numer_of_channels = len(channels)
+    length_of_rows = len(channels[0][0])
+    number_of_rows = len(channels[0])
+    for k in range(number_of_rows):
         row = []
-        for k in range(len(channels[i])):
+        for j in range(length_of_rows):
             pixel = []
-            if len(channels) >= 1:
-                pixel.append(channels[0][i][k])
-            if len(channels) >= 2:
-                pixel.append(channels[1][i][k])
-            if len(channels) >= 3:
-                pixel.append(channels[2][i][k])
+            for i in range(numer_of_channels):
+                pixel.append(channels[i][k][j])
             row.append(pixel)
         colored_image.append(row)
     return colored_image
 
 
-# print(combine_channels([[[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
-    # [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
-    # [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]))
+print(combine_channels([[[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+                        [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
+                        [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]))
 
-# print(combine_channels([[[1]], [[2]]]))
+print(combine_channels([[[1]], [[2]]]))
 
 
 def RGB2grayscale(colored_image: ColoredImage) -> SingleChannelImage:
@@ -145,10 +144,6 @@ def check_kerenel_value(value):
     if value < 0:
         return 0
     return round(value)
-
-
-print(apply_kernel([[0, 1, 2, 0, 1], [1, 2, 2, 0, 0], [0, 1, 2, 1, 0], [
-    0, 2, 1, 1, 0], [0, 0, 1, 0, 2]], [[0, 0, 0], [1, -1, 0], [1, 1, -1]]))
 
 
 def bilinear_interpolation(image: SingleChannelImage, y: float, x: float) -> int:
