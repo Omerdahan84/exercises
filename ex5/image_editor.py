@@ -14,7 +14,7 @@
 ##############################################################################
 from ex5_helper import *
 from typing import Optional
-
+import math
 ##############################################################################
 #                                  Functions                                 #
 ##############################################################################
@@ -111,7 +111,8 @@ def mult(i, j, margin, image, kernel):
     return sum
 
 
-def apply_kernel(image: SingleChannelImage, kernel: Kernel) -> SingleChannelImage:
+def apply_kernel(image: SingleChannelImage, kernel: Kernel) -> \
+        SingleChannelImage:
     image_height = len(image)
     image_width = len(image[0])
     kernel_size = len(kernel)
@@ -157,7 +158,8 @@ def finding_neighbors(image, y, x):
     return a, b, c, d
 
 
-def bilinear_interpolation(image: SingleChannelImage, y: float, x: float) -> int:
+def bilinear_interpolation(image: SingleChannelImage, y: float, x: float) \
+        -> int:
     """Return the bilinear_interpolation of pixel in his relative location in image"""
     # setting the neighbors
     a, b, c, d = finding_neighbors(image, y, x)
@@ -172,32 +174,85 @@ def bilinear_interpolation(image: SingleChannelImage, y: float, x: float) -> int
 
 
 def relative_position(i, j, new_width, new_height, image):
+    """get the position in the new image and return the relative position in the source"""
     y = (i / (new_height - 1))*(len(image)-1)
     x = (j / (new_width - 1))*(len(image[0])-1)
     return y, x
 
 
-def resize(image: SingleChannelImage, new_height: int, new_width: int) -> SingleChannelImage:
+def resize(image: SingleChannelImage, new_height: int, new_width: int)\
+        -> SingleChannelImage:
+    """scale the image to new height x new width dimensions"""
     bigger_picture = []
+    # Creating each row of the new image
     for i in range(new_height):
         bigger_row = []
+        # creating the new pixels and adds the to the row
         for j in range(new_width):
+            # calculating relative position
             y, x = relative_position(i, j, new_width, new_height, image)
+            # adding the new pixel to the row
             bigger_row.append(bilinear_interpolation(image, y, x))
+            # claculates according to bilinear interpolation formula
         bigger_picture.append(bigger_row)
     return bigger_picture
 
 
+def rotate_right(image: Image) -> Image:
+    """Rotate image to the right"""
+    rows = len(image)
+    cols = len(image[0])
+    res = []
+    for i in range(cols):
+
+        temp = []
+        for j in range(rows):
+            # inserting the appropiate value
+            temp.append(image[j][i])
+        # reverse  the row
+        res.append(temp[::-1])
+    return res
+
+
+def rotate_left(image: Image):
+    """rotate image to the left"""
+    rows = len(image)
+    cols = len(image[0])
+    res = []
+    for i in range(cols):
+        temp = []
+        for j in range(rows):
+            temp.append(image[j][i])
+        res.append(temp)
+    return res[::-1]
+
+
 def rotate_90(image: Image, direction: str) -> Image:
-    ...
+    if direction == 'R':
+        rotate = rotate_right(image)
+    elif direction == 'L':
+        rotate = rotate_left(image)
+    return rotate
 
 
 def get_edges(image: SingleChannelImage, blur_size: int, block_size: int, c: float) -> SingleChannelImage:
-    ...
+    blur = apply_kernel(image, blur_kernel(blur_size))
+    return
 
 
 def quantize(image: SingleChannelImage, N: int) -> SingleChannelImage:
-    ...
+    quantize_image = []
+    for i in range(len(image)):
+        quantize_row = []
+        for j in range(len(image[0])):
+            quantize_pixel = round(math.floor(
+                image[i][j]*(N/256))*((255)/(N-1)))
+            quantize_row.append(quantize_pixel)
+        quantize_image.append(quantize_row)
+    return quantize_image
+
+
+print(quantize([[0, 50, 100], [150, 200, 250]], 8))
 
 
 def quantize_colored_image(image: ColoredImage, N: int) -> ColoredImage:
