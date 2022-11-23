@@ -57,13 +57,6 @@ def combine_channels(channels: List[SingleChannelImage]) -> ColoredImage:
     return colored_image
 
 
-print(combine_channels([[[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
-                        [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
-                        [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]))
-
-print(combine_channels([[[1]], [[2]]]))
-
-
 def RGB2grayscale(colored_image: ColoredImage) -> SingleChannelImage:
     """Gets a colorful image and turn it to grayscale"""
     gray_img: SingleChannelImage = []
@@ -146,12 +139,53 @@ def check_kerenel_value(value):
     return round(value)
 
 
+def finding_neighbors(image, y, x):
+    """finding the neighbors pixels relative to y,x position"""
+    # Adjust the values of a the left upper pixel according to x,y
+    if int(y) == len(image)-1 and int(x) == len(image[0])-1:
+        a = [int(y)-1, int(x)-1]
+    elif int(x) == len(image[0])-1:
+        a = [int(y), int(x)-1]
+    elif int(y) == len(image)-1:
+        a = [int(y)-1, int(x)]
+    else:
+        a = [int(y), int(x)]
+    # sest other neighbors according to the location of a
+    b = [a[0]+1, a[1]]
+    c = [a[0], a[1]+1]
+    d = [a[0]+1, a[1]+1]
+    return a, b, c, d
+
+
 def bilinear_interpolation(image: SingleChannelImage, y: float, x: float) -> int:
-    ...
+    """Return the bilinear_interpolation of pixel in his relative location in image"""
+    # setting the neighbors
+    a, b, c, d = finding_neighbors(image, y, x)
+    delta_y = (y-a[0])  # calculating delta y
+    delta_x = (x-a[1])  # calculating delta x
+    # calculating accoeding to the formula
+    inter = image[a[0]][a[1]]*(1-delta_x)*(1-delta_y)+image[b[0]][b[1]]*delta_y*(1-delta_x) +\
+        image[c[0]][c[1]]*delta_x*(1-delta_y) + \
+        image[d[0]][d[1]]*delta_x*delta_y
+    # returned rounded value
+    return round(inter)
+
+
+def relative_position(i, j, new_width, new_height, image):
+    y = (i / (new_height - 1))*(len(image)-1)
+    x = (j / (new_width - 1))*(len(image[0])-1)
+    return y, x
 
 
 def resize(image: SingleChannelImage, new_height: int, new_width: int) -> SingleChannelImage:
-    ...
+    bigger_picture = []
+    for i in range(new_height):
+        bigger_row = []
+        for j in range(new_width):
+            y, x = relative_position(i, j, new_width, new_height, image)
+            bigger_row.append(bilinear_interpolation(image, y, x))
+        bigger_picture.append(bigger_row)
+    return bigger_picture
 
 
 def rotate_90(image: Image, direction: str) -> Image:
