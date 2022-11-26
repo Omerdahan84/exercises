@@ -12,9 +12,13 @@
 ##############################################################################
 #                                   Imports                                  #
 ##############################################################################
+
+from PIL import Image
 from ex5_helper import *
 from typing import Optional
 import math
+import copy
+import sys
 ##############################################################################
 #                                  Functions                                 #
 ##############################################################################
@@ -26,16 +30,20 @@ def separate_channels(image: ColoredImage) -> List[SingleChannelImage]:
     if len(image) == 0 or len(image[0]) == 0 or len(image[0][0]) == 0:
         return [[[]]]
     i = 0
+    # for every channel the function creates a channel table
     while i < len(image[0][0]):
         channel_table = []
         for row in image:
             row_channel = []
             for pixel in row:
-                if (i >= len(pixel)):
-                    continue
+                # for each row in the current pixel we will add the pixel to the
+                # appropiate channel
                 row_channel.append(pixel[i])
+            # after each row we wiil add it to the channel table
             channel_table.append(row_channel)
+        # moving to the next channel
         i += 1
+        # adding the channel table to the list of channels
         img_lst.append(channel_table)
     return img_lst
 
@@ -43,14 +51,24 @@ def separate_channels(image: ColoredImage) -> List[SingleChannelImage]:
 def combine_channels(channels: List[SingleChannelImage]) -> ColoredImage:
     "Take a list of one channel images and combine it to one channle"
     colored_image = []
+    # number of channels equal to the len of the
     numer_of_channels = len(channels)
+    # channel list
+    # the number of pixel in each row in the
     length_of_rows = len(channels[0][0])
-    number_of_rows = len(channels[0])
+    # colurful image equals to the number of elements in a row in one channel
+    # row
+    number_of_rows = len(channels[0])  # number of rows equal to the number of
+    # columns in the input
+    # going over the row and adding pixel from
     for k in range(number_of_rows):
         row = []
         for j in range(length_of_rows):
             pixel = []
             for i in range(numer_of_channels):
+                # adding the apporopiate color the the pixel, we
+                # iretating in a vertical way on each column of the chnnels list
+                # every columns equal to a new pixel in the colorful image
                 pixel.append(channels[i][k][j])
             row.append(pixel)
         colored_image.append(row)
@@ -66,7 +84,6 @@ def RGB2grayscale(colored_image: ColoredImage) -> SingleChannelImage:
         # in each row we iretating over the pixel and make them a one value
         # grayscale pixel acording to the formula
         for j in range(len(colored_image[i])):
-            gray_pixel = 0
             gray_pixel = round((colored_image[i][j][0]*0.299) + (
                 colored_image[i][j][1]*0.587)+(colored_image[i][j][2]*0.114))
             gray_row.append(gray_pixel)  # Adding the gray pixel
@@ -85,26 +102,24 @@ def blur_kernel(size: int) -> Kernel:
     return Kernel
 
 
-def in_bounds(width, height, current_row, current_col, margin):
-    """check if a given locatin is in bound of matrix"""
-    if current_row - margin < 0 or current_col - margin < 0 or current_col + margin >= height or\
-            current_row + margin >= width:
-        return False
-    return True
-
-
 def mult(i, j, margin, image, kernel):
     """multuply kernel to matrix"""
     sum = 0
     kerenl_row = 0
     kerenl_col = 0
     def_val = image[i][j]
+    # iritating over the size of the kernel where i,j is the center element
     for r in range(i-margin, i+margin+1):
         kerenl_col = 0
         for c in range(j-margin, j+margin+1):
+            # if an image elment is out of bounds we will multiply the
+            # appropiate kenel value with the center value
             if r < 0 or r >= len(image) or c < 0 or c >= len(image[0]):
                 sum += def_val*kernel[kerenl_row][kerenl_col]
             else:
+                # if an image elment is in bounds we will multiply the
+                # appropiate kenel value with the the value from the
+                # image
                 sum += image[r][c] * kernel[kerenl_row][kerenl_col]
             kerenl_col += 1
         kerenl_row += 1
@@ -113,20 +128,19 @@ def mult(i, j, margin, image, kernel):
 
 def apply_kernel(image: SingleChannelImage, kernel: Kernel) -> \
         SingleChannelImage:
+    """return an image after applying a kernel matrix on it"""
     image_height = len(image)
     image_width = len(image[0])
     kernel_size = len(kernel)
     margin = kernel_size // 2
     img_kernel = []
+    # iritating over the matrix
     for i in range(image_height):
         row_kernel = []
         for j in range(image_width):
-            if in_bounds(image_width, image_height, i, j, margin):
-                sum = mult(i, j, margin, image, kernel)
-                row_kernel.append(check_kerenel_value(sum))
-            else:
-                sum = mult(i, j, margin, image, kernel)
-                row_kernel.append(check_kerenel_value(sum))
+            # calculates the new value and add it ccording to the demands
+            sum = mult(i, j, margin, image, kernel)
+            row_kernel.append(check_kerenel_value(sum))
         img_kernel.append(row_kernel)
     return img_kernel
 
@@ -142,7 +156,7 @@ def check_kerenel_value(value):
 
 def finding_neighbors(image, y, x):
     """finding the neighbors pixels relative to y,x position"""
-    # Adjust the values of a the left upper pixel according to x,y
+    # Adjust the values of a the corner pixels according to x,y
     if int(y) == len(image)-1 and int(x) == len(image[0])-1:
         a = [int(y)-1, int(x)-1]
     elif int(x) == len(image[0])-1:
@@ -204,10 +218,9 @@ def rotate_right(image: Image) -> Image:
     cols = len(image[0])
     res = []
     for i in range(cols):
-
         temp = []
         for j in range(rows):
-            # inserting the appropiate value
+            # transpose the matrix
             temp.append(image[j][i])
         # reverse  the row
         res.append(temp[::-1])
@@ -222,8 +235,10 @@ def rotate_left(image: Image):
     for i in range(cols):
         temp = []
         for j in range(rows):
+            # transpose the matrix
             temp.append(image[j][i])
         res.append(temp)
+        # reverse the whole matrix
     return res[::-1]
 
 
@@ -235,29 +250,257 @@ def rotate_90(image: Image, direction: str) -> Image:
     return rotate
 
 
-def get_edges(image: SingleChannelImage, blur_size: int, block_size: int, c: float) -> SingleChannelImage:
+def avg_calc(i, j, margin, image):
+    """return tha average value of kxk matrix to
+    neighborhood of a given elemnt"""
+    sum = 0
+    count = 0
+    def_val = image[i][j]
+    for r in range(i-margin, i+margin+1):
+        for c in range(j-margin, j+margin+1):
+            # checking if value is in bounds if not adding the center value
+            # else adding the appropiate value and counting the number of
+            # elements anyway
+            if r < 0 or r >= len(image) or c < 0 or c >= len(image[0]):
+                sum += def_val
+                count += 1
+            else:
+                sum += image[r][c]
+                count += 1
+    return sum/count
+
+
+def get_edges(image: SingleChannelImage, blur_size: int, block_size: int, c: float)\
+        -> SingleChannelImage:
+    # making the image blur according the kernel size
     blur = apply_kernel(image, blur_kernel(blur_size))
-    return
+    margin = block_size // 2
+    edges = []
+    height = len(image)
+    width = len(image[0])
+    for i in range(height):
+        edges_row = []
+        for j in range(width):
+            # for each pixel we will calculate the threshold , if the
+            # current pixel is lower the thrshold we will color it black(0)
+            # else we will color it white(255)
+            threshold = avg_calc(i, j, margin, blur) - c
+            if blur[i][j] < threshold:
+                edges_row.append(0)
+            else:
+                edges_row.append(255)
+
+        edges.append(edges_row)
+    return edges
 
 
 def quantize(image: SingleChannelImage, N: int) -> SingleChannelImage:
     quantize_image = []
+    """return a quantize image according to the formula"""
     for i in range(len(image)):
-        quantize_row = []
+        quantize_row = []  # creating new line according to the lines in
+        # the originial image
         for j in range(len(image[0])):
             quantize_pixel = round(math.floor(
-                image[i][j]*(N/256))*((255)/(N-1)))
+                image[i][j]*(N/256))*((255)/(N-1)))  # calculate the new value of the pixel
+            # adding the new pixel to the row
             quantize_row.append(quantize_pixel)
-        quantize_image.append(quantize_row)
+        quantize_image.append(quantize_row)  # adding the row to the image
     return quantize_image
 
 
-print(quantize([[0, 50, 100], [150, 200, 250]], 8))
-
-
 def quantize_colored_image(image: ColoredImage, N: int) -> ColoredImage:
-    ...
+    """makinhg quantize to colored image"""
+    image_copy = copy.deepcopy(image)  # creating deep copy of the image
+    channels = separate_channels(image_copy)  # seperate the channels
+    new_image = []
+    # for each channel we will apply quantize and the combine the channels together
+    for channel in channels:
+        new_channel = quantize(channel, N)
+        new_image.append(new_channel)
+    return combine_channels(new_image)
+
+
+def activate_kernel(new_image, user_input, colorful):
+
+    if not user_input.isnumeric():
+        return None
+    elif int(user_input) % 2 == 0:
+        return None
+    user_input = int(user_input)
+    if not colorful:
+        return apply_kernel(new_image, blur_kernel(user_input))
+    else:
+        channels = separate_channels(new_image)
+        table = []
+        for channel in channels:
+            table.append(apply_kernel(channel, blur_kernel(user_input)))
+    return combine_channels(table)
+
+
+def activate_resize(height, width, image):
+    channels = separate_channels(image)
+    table = []
+    for channel in channels:
+        table.append(resize(channel, height, width))
+    return combine_channels(table)
+
+
+def activate_get_edges(new_image, blur_size, block_size,  c):
+    channels = separate_channels(new_image)
+    table = []
+    for channel in channels:
+        table.append(get_edges(channel, blur_size, block_size, c))
+    return combine_channels(table)
 
 
 if __name__ == '__main__':
-    ...
+    # checking if the number of arguments is valid
+    if len(sys.argv) != 2:
+        print("usage:python3 image_editor.py <image_path>")
+        sys.exit()
+    # load the image
+    image_path = sys.argv[1]
+    image = load_image(image_path)
+    new_image = copy.deepcopy(image)
+    message = "Available options in the editor(how to call): \n\
+convert picture to grayscale(1)\n\
+making the picture blur(2)\nchanging the size of the image(3)\n\
+rotating the picture left or right in 90 degrees(4)\n\
+create an image with the edges of the original image(5)\n\
+make the image quantize(6)\n\
+show the image(7)\n\
+stop the editor and save changes(8\n"
+    # running the editor
+    while True:
+        # checks if image is colorful
+        if type(new_image[0][0]) == list:
+            colorful = True
+        else:
+            colorful = False
+
+        user_input = input("\n"+message+"please choose an \
+edit you would like to do:")
+
+        while user_input not in "12345678":  # checks if the user input is valid if not asks for anothe inpus
+            error_message = "You choosed a wrong number or entered an invalid input\n\nAvailable \
+options in the editor(how to call): \nconvert picture to grayscale(1)\n\
+making the picture blur(2)\nchanging the size of the image(3)\n\
+rotating the picture left or right in 90 degrees(4)\n\
+create an image with the edges of the original image(5)\n\
+make the image quantize(6)\n\
+show the image(7)\n\
+stop the editor and save changes(8)\n"
+            user_input = input(error_message+"please choose an \
+edit you would like to do:")
+
+        # activating the editor for grayscale
+        if user_input == '1':
+            if not colorful:
+                print("image is alrady in grayscale")
+            else:
+                new_image = RGB2grayscale(new_image)
+                save_image(new_image, "/home/omerd/intro2cs/exercises/ex5")
+
+        # acitvating kernel
+        if user_input == '2':
+            kernel_size = input(
+                "Enter the size of the kernel you want to blur with: ")
+            if activate_kernel(new_image, kernel_size, colorful) is None:
+                print("please enter a valid value")
+            else:
+                new_image = activate_kernel(
+                    new_image, kernel_size, colorful)
+                save_image(new_image, "/home/omerd/intro2cs/exercises/ex5")
+        # activate resize
+        if user_input == '3':
+            user_input = input(
+                "Enter the dimensions of the new image:(height,width) ")
+
+            dimension = user_input.split(",")
+            if len(dimension) != 2:
+                print("invalid format")
+            elif not dimension[0].isnumeric() or int(dimension[0]) < 1:
+                print("invalid format")
+            elif not dimension[1].isnumeric() or len(dimension) > 2 \
+                    or int(dimension[1]) < 1:
+                print("invalid format")
+            else:
+
+                if not colorful:
+                    new_image = resize(new_image, int(
+                        dimension[0]), int(dimension[1]))
+                    save_image(
+                        new_image, "/home/omerd/intro2cs/exercises/ex5")
+                else:
+                    new_image = activate_resize(
+                        int(dimension[0]), int(dimension[1]), new_image)
+                    save_image(
+                        new_image, "/home/omerd/intro2cs/exercises/ex5")
+        # activate rotate
+        if user_input == '4':
+            user_input = input("choose a direction to rotate the image(R/L)")
+            if user_input != 'L' and user_input != 'R':
+                print("invalid format")
+            elif user_input == 'L':
+                new_image = rotate_90(new_image, 'L')
+                save_image(
+                    new_image, "/home/omerd/intro2cs/exercises/ex5")
+            elif user_input == 'R':
+                new_image = rotate_90(new_image, 'R')
+                save_image(
+                    new_image, "/home/omerd/intro2cs/exercises/ex5")
+        # activate get edges
+        if user_input == '5':
+            user_input = input(
+                "enter blur size,block size and c:(sizes are odd)")
+            inputs = user_input.split(',')
+            if len(inputs) != 3:
+                print("invalid format")
+            elif not inputs[0].isnumeric():
+                print("invalid format")
+            elif not inputs[1].isnumeric():
+                print("invalid format")
+            elif inputs[2].isalpha():
+                print("invalid format")
+            else:
+                blur_size = int(inputs[0])
+                block_size = int(inputs[1])
+                c = float(inputs[2])
+                if blur_size < 1 or blur_size % 2 == 0 or \
+                        block_size < 1 or block_size % 2 == 0 or \
+                        c < 0:
+                    print("invalid format")
+                else:
+                    if not colorful:
+                        new_image = get_edges(
+                            new_image, blur_size, block_size, c)
+                        save_image(
+                            new_image, "/home/omerd/intro2cs/exercises/ex5")
+                    else:
+                        new_image = activate_get_edges(
+                            new_image, blur_size, block_size, c)
+                        save_image(
+                            new_image, "/home/omerd/intro2cs/exercises/ex5")
+        # activate quantize
+        if user_input == '6':
+            user_input = input(
+                "enter the number of channels you want to quantize")
+            if not user_input.isnumeric():
+                print("invalid input")
+            elif int(user_input) < 1:
+                print("invalid input")
+            else:
+                if colorful:
+                    new_image = quantize_colored_image(
+                        new_image, int(user_input))
+                else:
+                    new_image = quantize(new_image, int(user_input))
+        # shows the image
+        if user_input == '7':
+            show_image(new_image)
+        # finish running
+        if user_input == '8':
+            user_input = ("enter a path to save result")
+            save_image(new_image, user_input)
+            break

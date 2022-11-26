@@ -14,8 +14,6 @@ def test_separate_channels():
                                                     2, 2, 2], [2, 2, 2]],
                                                 [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]
 
-    assert image_editor.separate_channels([[[1, 2], [1]]]) == [
-        [[1, 1]], [[2]]]
     assert image_editor.separate_channels([[[1, 2], [1, 1]], [[1, 2], [1, 1]]]) == [
         [[1, 1], [1, 1]], [[2, 1], [2, 1]]]
     assert image_editor.separate_channels([[[1]]]) == [[[1]]]
@@ -23,9 +21,15 @@ def test_separate_channels():
         [[[1], [1]],
          [[2], [2]]]) == [[[1, 1], [2, 2]]]
     assert image_editor.separate_channels([[[1]]]) == [[[1]]]
-    assert image_editor.separate_channels([[[]]]) == [[[]]]
-    assert image_editor.separate_channels([[]]) == [[[]]]
-    assert image_editor.separate_channels([]) == [[[]]]
+    assert image_editor.separate_channels([[[1, 2], [3, 4]]]) == [
+        [[1, 3]], [[2, 4]]]
+    assert image_editor.separate_channels([[[1, 2]], [[3, 4]]]) == [
+        [[1], [3]], [[2], [4]]]
+    assert image_editor.separate_channels(
+        [[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]) == [
+        [[1, 4], [7, 10]], [[2, 5], [8, 11]], [[3, 6], [9, 12]]]
+    assert image_editor.separate_channels(
+        [[[1, 2, 3]]*3]*4) == [[[1]*3]*4, [[2]*3]*4, [[3]*3]*4]
 
 
 def test_combine_channels():
@@ -151,7 +155,7 @@ def test_bilinear_interpolation():
 
 
 def test_resize():
-    image_editor.resize([[0, 50], [100, 200]], 3, 4) == [
+    assert image_editor.resize([[0, 50], [100, 200]], 3, 4) == [
         [0, 17, 33, 50], [50, 75, 100, 125], [100, 133, 167, 200]]
     assert image_editor.resize([[0, 1], [2, 3]], 10, 10)[9][9] == 3
     assert image_editor.resize([[0, 1], [2, 3]], 10, 10)[0][0] == 0
@@ -217,3 +221,17 @@ def test_quantize():
     assert image_editor.quantize([[32, 76, 65, 4], [54, 47, 8, 7], [1, 2, 84, 95], [87, 57, 35, 3], [123, 234, 5, 3]], 5) ==\
         [[0, 64, 64, 0], [64, 0, 0, 0], [0, 0, 64, 64],
             [64, 64, 0, 0], [128, 255, 0, 0]]
+
+
+def test_quantize_colored_image():
+    assert image_editor.quantize_colored_image([[[33, 5], [34, 2]], [[24, 43], [45, 56]], [[87, 76], [65, 54]]], 30) ==\
+        [[[26, 0], [26, 0]], [[18, 44], [44, 53]], [[88, 70], [62, 53]]]
+
+
+def test_get_edges():
+    assert image_editor.get_edges([[200, 50, 200]], 3, 3, 10) == [
+        [255, 0, 255]]
+    assert image_editor.get_edges([[200, 50, 200], [200, 50, 200], [200, 50, 200]], 1, 3,
+                                  10) == [[255, 0, 255], [255, 0, 255], [255, 0, 255]]
+    assert image_editor.get_edges([[23, 34, 45], [65, 54, 43], [3, 8, 4]], 3, 3, 3) == [
+        [255, 255, 255], [255, 255, 255], [0, 0, 0]]
