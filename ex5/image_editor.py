@@ -13,7 +13,7 @@
 #                                   Imports                                  #
 ##############################################################################
 
-from PIL import Image
+
 from ex5_helper import *
 from typing import Optional
 import math
@@ -322,7 +322,8 @@ def quantize_colored_image(image: ColoredImage, N: int) -> ColoredImage:
 
 
 def activate_kernel(new_image, user_input, colorful):
-
+    """checks the input of the user to the kernel size and 
+    runs kernel for one channel and multy channels"""
     if not user_input.isnumeric():
         return None
     elif int(user_input) % 2 == 0:
@@ -339,6 +340,7 @@ def activate_kernel(new_image, user_input, colorful):
 
 
 def activate_resize(height, width, image):
+    """avtivate resize to multi channel image"""
     channels = separate_channels(image)
     table = []
     for channel in channels:
@@ -346,44 +348,39 @@ def activate_resize(height, width, image):
     return combine_channels(table)
 
 
-def activate_get_edges(new_image, blur_size, block_size,  c):
-    channels = separate_channels(new_image)
-    table = []
-    for channel in channels:
-        table.append(get_edges(channel, blur_size, block_size, c))
-    return combine_channels(table)
-
-
 if __name__ == '__main__':
-    # checking if the number of arguments is valid
+    """This pare of the program running the editor"""
+    # checking if the number of arguments is valid (2)
     if len(sys.argv) != 2:
         print("usage:python3 image_editor.py <image_path>")
-        sys.exit()
-    # load the image
-    image_path = sys.argv[1]
-    image = load_image(image_path)
-    new_image = copy.deepcopy(image)
-    message = "Available options in the editor(how to call): \n\
+
+    else:
+        image_path = sys.argv[1]  # takes the argument to image path
+        image = load_image(image_path)  # load the image
+        new_image = copy.deepcopy(image)  # creating a new copy of the image
+        message = "Available options in the editor(how to call): \n\
 convert picture to grayscale(1)\n\
 making the picture blur(2)\nchanging the size of the image(3)\n\
 rotating the picture left or right in 90 degrees(4)\n\
 create an image with the edges of the original image(5)\n\
 make the image quantize(6)\n\
 show the image(7)\n\
-stop the editor and save changes(8\n"
-    # running the editor
-    while True:
-        # checks if image is colorful
-        if type(new_image[0][0]) == list:
-            colorful = True
-        else:
-            colorful = False
-
-        user_input = input("\n"+message+"please choose an \
+stop the editor and save changes(8\n"  # an outpus message
+        # running the editor
+        while True:
+            # checks if image is colorful
+            if type(new_image[0][0]) == list:
+                colorful = True
+            else:
+                colorful = False
+            # prompt the uset to choose type of function to run
+            user_input = input("\n"+message+"please choose an \
 edit you would like to do:")
-
-        while user_input not in "12345678":  # checks if the user input is valid if not asks for anothe inpus
-            error_message = "You choosed a wrong number or entered an invalid input\n\nAvailable \
+            # if answer does not exist prompt to ask again
+            while user_input not in "12345678":  # checks if the user input is
+                # valid if not asks for anothe input
+                error_message = "You choosed a wrong number or entered an invalid \
+input\n\nAvailable \
 options in the editor(how to call): \nconvert picture to grayscale(1)\n\
 making the picture blur(2)\nchanging the size of the image(3)\n\
 rotating the picture left or right in 90 degrees(4)\n\
@@ -391,116 +388,109 @@ create an image with the edges of the original image(5)\n\
 make the image quantize(6)\n\
 show the image(7)\n\
 stop the editor and save changes(8)\n"
-            user_input = input(error_message+"please choose an \
+                user_input = input(error_message+"please choose an \
 edit you would like to do:")
 
-        # activating the editor for grayscale
-        if user_input == '1':
-            if not colorful:
-                print("image is alrady in grayscale")
-            else:
-                new_image = RGB2grayscale(new_image)
-                save_image(new_image, "/home/omerd/intro2cs/exercises/ex5")
-
-        # acitvating kernel
-        if user_input == '2':
-            kernel_size = input(
-                "Enter the size of the kernel you want to blur with: ")
-            if activate_kernel(new_image, kernel_size, colorful) is None:
-                print("please enter a valid value")
-            else:
-                new_image = activate_kernel(
-                    new_image, kernel_size, colorful)
-                save_image(new_image, "/home/omerd/intro2cs/exercises/ex5")
-        # activate resize
-        if user_input == '3':
-            user_input = input(
-                "Enter the dimensions of the new image:(height,width) ")
-
-            dimension = user_input.split(",")
-            if len(dimension) != 2:
-                print("invalid format")
-            elif not dimension[0].isnumeric() or int(dimension[0]) < 1:
-                print("invalid format")
-            elif not dimension[1].isnumeric() or len(dimension) > 2 \
-                    or int(dimension[1]) < 1:
-                print("invalid format")
-            else:
-
+            # activating the editor for grayscale
+            if user_input == '1':
                 if not colorful:
-                    new_image = resize(new_image, int(
-                        dimension[0]), int(dimension[1]))
-                    save_image(
-                        new_image, "/home/omerd/intro2cs/exercises/ex5")
+                    print("image is alrady in grayscale")
                 else:
-                    new_image = activate_resize(
-                        int(dimension[0]), int(dimension[1]), new_image)
-                    save_image(
-                        new_image, "/home/omerd/intro2cs/exercises/ex5")
-        # activate rotate
-        if user_input == '4':
-            user_input = input("choose a direction to rotate the image(R/L)")
-            if user_input != 'L' and user_input != 'R':
-                print("invalid format")
-            elif user_input == 'L':
-                new_image = rotate_90(new_image, 'L')
-                save_image(
-                    new_image, "/home/omerd/intro2cs/exercises/ex5")
-            elif user_input == 'R':
-                new_image = rotate_90(new_image, 'R')
-                save_image(
-                    new_image, "/home/omerd/intro2cs/exercises/ex5")
-        # activate get edges
-        if user_input == '5':
-            user_input = input(
-                "enter blur size,block size and c:(sizes are odd)")
-            inputs = user_input.split(',')
-            if len(inputs) != 3:
-                print("invalid format")
-            elif not inputs[0].isnumeric():
-                print("invalid format")
-            elif not inputs[1].isnumeric():
-                print("invalid format")
-            elif inputs[2].isalpha():
-                print("invalid format")
-            else:
-                blur_size = int(inputs[0])
-                block_size = int(inputs[1])
-                c = float(inputs[2])
-                if blur_size < 1 or blur_size % 2 == 0 or \
-                        block_size < 1 or block_size % 2 == 0 or \
-                        c < 0:
+                    new_image = RGB2grayscale(new_image)
+            # acitvating kernel
+            if user_input == '2':
+                kernel_size = input(
+                    "Enter the size of the kernel you want to blur with: ")
+                if activate_kernel(new_image, kernel_size, colorful) is None:
+                    print("please enter a valid value")
+                else:
+                    new_image = activate_kernel(
+                        new_image, kernel_size, colorful)
+            # activate resize
+            if user_input == '3':
+                new_dim = input(
+                    "Enter the dimensions of the new image:(height,width) ")
+
+                dimension = new_dim.split(",")
+                if len(dimension) != 2:
+                    print("invalid format")
+                elif not dimension[0].isnumeric() or int(dimension[0]) <= 1:
+                    print("invalid format")
+                elif not dimension[1].isnumeric() or len(dimension) > 2 \
+                        or int(dimension[1]) <= 1:
                     print("invalid format")
                 else:
+
                     if not colorful:
-                        new_image = get_edges(
-                            new_image, blur_size, block_size, c)
-                        save_image(
-                            new_image, "/home/omerd/intro2cs/exercises/ex5")
+                        new_image = resize(new_image, int(
+                            dimension[0]), int(dimension[1]))
+
                     else:
-                        new_image = activate_get_edges(
-                            new_image, blur_size, block_size, c)
-                        save_image(
-                            new_image, "/home/omerd/intro2cs/exercises/ex5")
-        # activate quantize
-        if user_input == '6':
-            user_input = input(
-                "enter the number of channels you want to quantize")
-            if not user_input.isnumeric():
-                print("invalid input")
-            elif int(user_input) < 1:
-                print("invalid input")
-            else:
-                if colorful:
-                    new_image = quantize_colored_image(
-                        new_image, int(user_input))
+                        new_image = activate_resize(
+                            int(dimension[0]), int(dimension[1]), new_image)
+
+            # activate rotate
+            if user_input == '4':
+                direction = input(
+                    "choose a direction to rotate the image(R/L)")
+                if direction != 'L' and direction != 'R':
+                    print("invalid format")
+                elif direction == 'L':
+                    new_image = rotate_90(new_image, 'L')
+                elif direction == 'R':
+                    new_image = rotate_90(new_image, 'R')
+            # activate get edges
+            if user_input == '5':
+                sizes = input(
+                    "enter blur size,block size and c:(sizes are odd)")
+                inputs = sizes.split(',')
+                if len(inputs) != 3:
+                    print("invalid format")
+                elif not inputs[0].isnumeric():
+                    print("invalid format")
+                elif not inputs[1].isnumeric():
+                    print("invalid format")
+                elif not inputs[2].replace(".", "", 1).isdigit():
+                    print("invalid format")
                 else:
-                    new_image = quantize(new_image, int(user_input))
-        # shows the image
-        if user_input == '7':
-            show_image(new_image)
-        # finish running
-        if user_input == '8':
-            user_input = ("enter a path to save result")
-            save_image(new_image, user_input)
-            break
+                    blur_size = int(inputs[0])
+                    block_size = int(inputs[1])
+                    c = float(inputs[2])
+                    if blur_size < 1 or blur_size % 2 == 0 or \
+                            block_size < 1 or block_size % 2 == 0 or \
+                            c < 0:
+                        print("invalid format")
+                    else:
+                        if not colorful:
+                            new_image = get_edges(
+                                new_image, blur_size, block_size, c)
+
+                        else:
+                            new_image = get_edges(
+                                RGB2grayscale(new_image), blur_size,
+                                block_size, c)
+
+            # activate quantize
+            if user_input == '6':
+                colors = input(
+                    "enter the number of channels you want to quantize")
+                if not colors.isnumeric():
+                    print("invalid input")
+                elif int(colors) <= 1:
+                    print("invalid input")
+                else:
+                    if colorful:
+                        new_image = quantize_colored_image(
+                            new_image, int(colors))
+
+                    else:
+                        new_image = quantize(new_image, int(colors))
+
+            # shows the image
+            if user_input == '7':
+                show_image(new_image)
+            # finish running
+            if user_input == '8':
+                path = input("enter a path to save result")
+                save_image(new_image, path)
+                break

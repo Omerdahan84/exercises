@@ -1,4 +1,5 @@
 import image_editor
+import copy
 
 
 def test_separate_channels():
@@ -30,6 +31,15 @@ def test_separate_channels():
         [[1, 4], [7, 10]], [[2, 5], [8, 11]], [[3, 6], [9, 12]]]
     assert image_editor.separate_channels(
         [[[1, 2, 3]]*3]*4) == [[[1]*3]*4, [[2]*3]*4, [[3]*3]*4]
+    assert image_editor.separate_channels([[[1, 2]]]) == [[[1]], [[2]]]
+    image = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    image_lst = [[[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+                 [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
+                 [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]
+    assert image_editor.separate_channels(image) == image_lst
 
 
 def test_combine_channels():
@@ -56,6 +66,15 @@ def test_combine_channels():
             [[[1] * 3] * 4, [[2] * 3] * 4, [[3] * 3] * 4])
         == [[[1, 2, 3]] * 3] * 4
     )
+    assert image_editor.combine_channels([[[1]], [[2]]]) == [[[1, 2]]]
+    image_lst = [[[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]],
+                 [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
+                 [[3, 3, 3], [3, 3, 3], [3, 3, 3], [3, 3, 3]]]
+    image = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    assert image_editor.combine_channels(image_lst) == image
 
 
 def test_grayscale():
@@ -65,6 +84,11 @@ def test_grayscale():
     assert image_editor.RGB2grayscale([[[100, 180, 240], [100, 180, 240]],
                                        [[100, 180, 240], [100, 180, 240]]]) == [[163, 163],
                                                                                 [163, 163]]
+    assert image_editor.RGB2grayscale(
+        [[[200, 0, 14], [15, 6, 50]]]) == [[61, 14]]
+    # Tests rounding up
+    assert image_editor.RGB2grayscale([[[100, 180, 240]]]) == [[163]]
+    # Tests rounding down
     assert image_editor.RGB2grayscale(
         [[[200, 0, 14], [15, 6, 50]]]) == [[61, 14]]
 
@@ -118,6 +142,19 @@ def test_apply_kernel():
         [[1, 2, 3]], [[0]*3, [0, 1, 0], [0]*3]) == [[1, 2, 3]]
     assert image_editor.apply_kernel(
         [[1, 2, 3]], [[0]*3, [0, 0, 1], [0]*3]) == [[2, 3, 3]]
+    assert image_editor.apply_kernel(
+        [[0, 128, 255]], image_editor.blur_kernel(3)) == [[14, 128, 241]]
+    image = [[10, 20, 30, 40, 50],
+             [8, 16, 24, 32, 40],
+             [6, 12, 18, 24, 30],
+             [4, 8, 12, 16, 20]]
+    image_blurred = [[12, 20, 26, 34, 44],
+                     [11, 17, 22, 27, 34],
+                     [10, 16, 20, 24, 29],
+                     [7, 11, 16, 18, 21]]
+
+    assert image_editor.apply_kernel(
+        image, image_editor.blur_kernel(5)) == image_blurred
 
 
 def test_bilinear_interpolation():
@@ -176,6 +213,23 @@ def test_resize():
     assert image_editor.resize([[1, 2, 4, 2], [2, 2, 4, 3], [4, 1, 3, 1], [5, 4, 1, 1]], 5, 5) == [
         [1, 2, 3, 4, 2], [2, 2, 3, 4, 3], [3, 2, 2, 3, 2], [4, 2, 2, 2, 1], [5, 4, 2, 1, 1]]
 
+    image = [[1, 0, 1],
+             [0, 0, 0],
+             [1, 0, 1]]
+    resized_img = [[1, 0, 0, 0, 1],
+                   [0, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 0],
+                   [1, 0, 0, 0, 1]]
+    assert image_editor.resize(image, 4, 5) == resized_img
+    assert image_editor.resize(resized_img, 3, 3) == image
+    image = [[1, 2, 3],
+             [4, 5, 6]]
+    assert image_editor.resize(image, 2, 3) == image
+    image = [[200, 100, 150]]
+    image_cpy = copy.deepcopy(image)
+    image_editor.resize(image, 4, 4)
+    assert image == image_cpy
+
 
 def test_rotate_90():
     assert image_editor.rotate_90([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 'R') == [[7, 4, 1],
@@ -213,6 +267,30 @@ def test_rotate_90():
         [[[4, 5, 6], [255, 200, 7]], [[1, 2, 3], [0, 5, 9]]]
     assert image_editor.rotate_90([[[23, 232], [34, 43]], [[12, 23], [32, 21]], [[12, 65], [87, 76]]], "R") ==\
         [[[12, 65], [12, 23], [23, 232]], [[87, 76], [32, 21], [34, 43]]]
+    image1 = [[1, 2, 3],
+              [4, 5, 6]]
+    image2 = [[4, 1],
+              [5, 2],
+              [6, 3]]
+    image3 = [[3, 6],
+              [2, 5],
+              [1, 4]]
+    assert image_editor.rotate_90(image1, "R") == image2
+    assert image_editor.rotate_90(image1, "L") == image3
+    assert image_editor.rotate_90(
+        image_editor.rotate_90(image2, "L"), "L") == image3
+    image4 = [[[1, 1], [2, 2]]]
+    image5 = [[[1, 1]],
+              [[2, 2]]]
+    assert image_editor.rotate_90(image4, "R") == image5
+    assert image_editor.rotate_90(image5, "L") == image4
+
+    # From the exercise PDF
+    image6 = [[[1, 2, 3], [4, 5, 6]],
+              [[0, 5, 9], [255, 200, 7]]]
+    image7 = [[[4, 5, 6], [255, 200, 7]],
+              [[1, 2, 3], [0, 5, 9]]]
+    assert image_editor.rotate_90(image6, 'L') == image7
 
 
 def test_quantize():
@@ -235,3 +313,41 @@ def test_get_edges():
                                   10) == [[255, 0, 255], [255, 0, 255], [255, 0, 255]]
     assert image_editor.get_edges([[23, 34, 45], [65, 54, 43], [3, 8, 4]], 3, 3, 3) == [
         [255, 255, 255], [255, 255, 255], [0, 0, 0]]
+
+
+def test_combine_channels_inversion():
+    image = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    assert image == image_editor.separate_channels(
+        image_editor.combine_channels(image))
+
+
+def test_separate_channels_non_mutation():
+    image = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    image_cpy = copy.deepcopy(image)
+    image_editor.separate_channels(image)
+    assert image == image_cpy
+
+
+def test_combine_channels_non_mutation():
+    channels = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+                [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+                [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+                [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    channels_cpy = copy.deepcopy(channels)
+    image_editor.combine_channels(channels)
+    assert channels == channels_cpy
+
+
+def test_combine_channels_inversion():
+    image = [[[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]],
+             [[1, 2, 3], [1, 2, 3], [1, 2, 3]]]
+    assert image == image_editor.separate_channels(
+        image_editor.combine_channels(image))
