@@ -356,8 +356,7 @@ if __name__ == '__main__':
 
     else:
         image_path = sys.argv[1]  # takes the argument to image path
-        image = load_image(image_path)  # load the image
-        new_image = copy.deepcopy(image)  # creating a new copy of the image
+        new_image = load_image(image_path)  # load the image
         message = "Available options in the editor(how to call): \n\
 convert picture to grayscale(1)\n\
 making the picture blur(2)\nchanging the size of the image(3)\n\
@@ -377,7 +376,7 @@ stop the editor and save changes(8\n"  # an outpus message
             user_input = input("\n"+message+"please choose an \
 edit you would like to do:")
             # if answer does not exist prompt to ask again
-            while user_input not in "12345678":  # checks if the user input is
+            while user_input not in "12345678" or user_input == '':  # checks if the user input is
                 # valid if not asks for anothe input
                 error_message = "You choosed a wrong number or entered an invalid \
 input\n\nAvailable \

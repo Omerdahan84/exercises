@@ -189,6 +189,8 @@ def test_bilinear_interpolation():
         [[0, 64], [128, 255]], 1, 1) == 255
     assert image_editor.bilinear_interpolation(
         [[0, 64], [128, 255]], 0.5, 0.5) == 112
+    assert image_editor.bilinear_interpolation(
+        [[1, 1, 1]], 0.4, 0.4) == [[1, 1, 1]]
 
 
 def test_resize():
