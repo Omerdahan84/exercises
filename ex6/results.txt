@@ -20,5 +20,5 @@ Ronald_Weasley.html 0.8867228977699411
 **********
 Harry_Potter.html 22.91433858659587
 Draco_Malfoy.html 1.5550815765128083
-Neville_Longbottom.html 1.0194544426096994
 Hermione_Granger.html 0.9344732605706293
+Ronald_Weasley.html 0.8867228977699411

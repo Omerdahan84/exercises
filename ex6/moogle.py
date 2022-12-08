@@ -211,7 +211,6 @@ def pages_values(lst_max_rank, query_words, word_dict, rank_dict):
     for page in sorted_value_dict:
         print(f'{page} {sorted_value_dict[page]}')
 
-
 def result(query_words, rank_dict, word_dict, max_results):
     lst_max_rank = max_ranks(query_words, rank_dict, word_dict, max_results)
     pages_values(lst_max_rank, query_words, word_dict, rank_dict)
