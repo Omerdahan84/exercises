@@ -2,7 +2,7 @@ import ex7_helper as helper
 from typing import *
 import copy
 
-def mult(x: Union[int, float], y: int) -> Union[int, float]:
+def mult(x: helper.N, y: int) -> helper.N:
     """takes an int or float and return the product of the two numbers
      :param:x,y , y is an int
      :return x*y"""
@@ -50,7 +50,7 @@ def is_power(b: int, x: int) -> bool:
     elif x==0 or b ==0 :
         return False
     return is_power_helper(1, b, x)
-def is_power_helper(counter:float, b:int, x:int)->int:
+def is_power_helper(counter:float, b:int, x:int)->bool:
     if counter == x:
         return True
     elif counter > x:
@@ -92,7 +92,7 @@ def reverse(s: str) -> str:
     return reverse_substring(0, len(s))
 
 
-def play_hanoi(hanoi: object, n: int, src: int, dest: int, temp: int) -> None:
+def play_hanoi(hanoi: Any, n: int, src: Any, dest: Any, temp: Any) -> None:
     """Solves the Tower of Hanoi puzzle for a given number of disks.
 
     Args:
@@ -105,12 +105,15 @@ def play_hanoi(hanoi: object, n: int, src: int, dest: int, temp: int) -> None:
     Returns:
         None. The function updates the state of the puzzle using the `hanoi.move` method.
     """
+    if n < 1:
+        return None
     if n == 1:
         hanoi.move(src, dest)
+
     else:
-        play_hanoi(hanoi, n - 1, src, temp, dest)
+        play_hanoi(hanoi, helper.subtract_1(n), src, temp, dest)
         hanoi.move(src, dest)
-        play_hanoi(hanoi, n - 1, temp, dest, src)
+        play_hanoi(hanoi,helper.subtract_1(n), temp, dest, src)
 def number_of_ones_helper(n: int, count: int) -> int:
     """return a number of ones for a specific integer"""
     if n == 0:
@@ -131,13 +134,30 @@ def compare_2d_lists(l1: List[List[int]], l2: List[List[int]]) -> bool:
     if len(l1) != len(l2):
         return False
 
-    # If the length of the external lists is zero, the lists are equal (since they are empty)
-    if len(l1) == 0:
+    # Check if the outer lists are empty
+    if len(l1) == 0 and len(l2) == 0:
         return True
+
+    # Check if the inner lists are empty
+    if len(l1) == 0 or len(l2) == 0:
+        return False
 
     # Recursive case: compare the first sublist of l1 with the first sublist of l2, and
     # compare the rest of the sublists recursively
-    return compare_2d_lists(l1[1:], l2[1:]) and compare_1d_lists(l1[0], l2[0])
+    return compare_2d_lists_helper(l1, l2, 0, 0)
+
+def compare_2d_lists_helper(l1: List[List[int]], l2: List[List[int]], i: int, j: int) -> bool:
+    # Base case: if we have reached the end of the outer lists, the lists are equal
+    if i == len(l1) and j == len(l2):
+        return True
+
+    # If we have reached the end of one of the outer lists, but not the other, the lists are not equal
+    if i == len(l1) or j == len(l2):
+        return False
+
+    # Recursive case: compare the current sublist of l1 with the current sublist of l2, and
+    # move on to the next sublists
+    return compare_1d_lists(l1[i], l2[j]) and compare_2d_lists_helper(l1, l2, i + 1, j + 1)
 
 def compare_1d_lists(l1: List[int], l2: List[int]) -> bool:
     # Base case: if the length of the two internal lists is different, the lists are not equal
@@ -150,10 +170,24 @@ def compare_1d_lists(l1: List[int], l2: List[int]) -> bool:
 
     # Recursive case: compare the first elements of the two lists, and compare the rest of the lists
     # recursively
-    return compare_1d_lists(l1[1:], l2[1:]) and (l1[0] == l2[0])
+    return compare_1d_lists_helper(l1, l2, 0, 0)
+def compare_1d_lists_helper(l1: List[int], l2: List[int], i: int, j: int) -> bool:
+    # Base case: if we have reached the end of the inner lists, the lists are equal
+    if i == len(l1) and j == len(l2):
+        return True
+
+    # If we have reached the end of one of the inner lists, but not the other, the lists are not equal
+    if i == len(l1) or j == len(l2):
+        return False
+
+    # Recursive case: compare the current elements of the lists, and move on to the next elements
+    return l1[i] == l2[j] and compare_1d_lists_helper(l1, l2, i + 1, j + 1)
 
 def magic_list(n: int) -> List[Any]:
+    """this function return a sequence of an empty lists according to rules in ex7 """
+    #base case
     if n == 0:
         return []
     else:
+        #recursive case, adding the next item in the sequence
         return magic_list(helper.subtract_1(n)) + [magic_list(helper.subtract_1(n))]

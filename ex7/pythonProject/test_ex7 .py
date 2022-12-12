@@ -113,3 +113,11 @@ def test_magic_list():
     deep_copy(magic)
 
 
+test_mult()
+test_is_even()
+test_log_mult()
+test_is_power()
+test_reverse()
+test_compare_2d_lists()
+test_magic_list()
+test_number_of_ones()
