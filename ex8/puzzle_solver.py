@@ -58,12 +58,12 @@ def min_seen_cells(picture: Picture, row: int, col: int) -> int:
     # every loop check the sides of the cell where the first loop also count the cell itself.
     # we're counting along the row/col if we see a black cell we can't see afterwards, so we break the loop
     for i in range(row, -1, -1):
-        if picture[i][col] == 0 or picture[row][i] == -1:
+        if picture[i][col] == 0 or picture[i][col] == -1:
             break
         else:
             count += 1
     for i in range(row + 1, len(picture), 1):
-        if picture[i][col] == 0 or picture[row][i] == -1:
+        if picture[i][col] == 0 or picture[i][col] == -1:
             break
         else:
             count += 1
@@ -85,7 +85,7 @@ def check_constraints(picture: Picture, constraints_set: Set[Constraint]) -> int
         row,col,seen = constraint
         max_seen = max_seen_cells(picture,row,col)
         min_seen = min_seen_cells(picture,row,col)
-        if seen != min_seen and seen != max_seen and (min_seen > seen or seen > max_seen):
+        if seen < min_seen or seen > max_seen:
             return 0
         if max_seen != min_seen and min_seen <= seen <= max_seen:
             return 2
@@ -93,49 +93,75 @@ def check_constraints(picture: Picture, constraints_set: Set[Constraint]) -> int
 
 
 
+def grid_builder(n:int,m:int) -> Picture:
+    """get a dimensions of a grid and return an empty grid
+    param: m-number of rows,n number of columns
+    return: grid"""
+    return [[-1 for _ in range(m)] for _ in range(n)]
+
 
 def solve_puzzle(constraints_set: Set[Constraint], n: int, m: int) -> Optional[Picture]:
-    """"""
-    grid = [[-1 for _ in range(m)] for _ in range(n)]
+    """return a solution for a board with set of constraints, if there is no solution return None"""
+    grid = grid_builder(n,m)
+    # Start the backtracking search.
+    return solve_puzzle_helper(0, 0,constraints_set,n,m,grid)
+def solve_puzzle_helper(row: int, col: int,constraints_set: Set[Constraint], n: int, m: int,grid:Picture) -> Optional[Picture]:
+    # If we have reached the last cell, we have found a valid solution.
+    if row == n-1 and col == m:
+        return grid
 
-    def backtrack(row: int, col: int) -> Optional[Picture]:
-        # If we have reached the last cell, we have found a valid solution.
-        if row == n and col == m:
-            return grid
+    # If we have reached the end of a row...
+    if col == m:
+        row += 1
+        col = 0
 
-        # If we have reached the end of a row, move to the next row.
-        if col == m:
-            row += 1
-            col = 0
+    # Skip cells that already have a value.
+    if grid[row][col] != -1:
+        return solve_puzzle_helper(row, col + 1,constraints_set,n,m,grid)
 
-        # Skip cells that are part of a constraint.
-        if (row, col) in constraints_set:
-            return backtrack(row, col + 1)
+    # Try setting the current cell to 0.
 
-        # Try filling the current cell with a 0 or a 1.
-        for value in (0, 1):
-            grid[row][col] = value
+    for value in (0,1):
+        grid[row][col] = value
+        if check_constraints(grid, constraints_set) != 0 :
+            solution = solve_puzzle_helper(row, col + 1,constraints_set,n,m,grid)
+            if solution is not None:
+                return solution
 
-            # Check if the constraints are satisfied.
-            if check_constraints(grid, constraints_set) == 1 or check_constraints(grid, constraints_set) == 2:
-                # If the constraints are satisfied, continue searching for a solution.
-                result = backtrack(row, col + 1)
-                if result is not None:
-                    return result
+        # If none of the above worked, backtrack.
+    grid[row][col] = -1
+    return None
 
-            # If we reach this point, it means that we have tried filling the current
-            # cell with both 0 and 1, but neither choice led to a valid solution.
-            # This means that the previous choices we made were not valid, so we need
-            # to backtrack (undo our choices) and try a different set of choices.
-            grid[row][col] = 0
-            return
 
-    return backtrack(0, 0)
-
-print( solve_puzzle({(0, 2, 3), (1, 1, 4), (2, 2, 5)}, 3, 3))
 def how_many_solutions(constraints_set: Set[Constraint], n: int, m: int) -> int:
-    ...
+    grid = grid_builder(n,m)
+    # Start the backtracking search.
+    return how_many_helper(0, 0, constraints_set, n, m, grid)
+def how_many_helper(row: int, col: int,constraints_set: Set[Constraint], n: int, m: int,grid:Picture,) -> Optional[Picture]:
 
+    # If we have reached the last cell, we have found a valid solution.
+    if row == n-1 and col == m:
+        return 1
+    # If we have reached the end of a row...
+    if col == m:
+        row += 1
+        col = 0
+
+    # Skip cells that already have a value.
+    if grid[row][col] != -1:
+        return how_many_helper(row, col + 1,constraints_set,n,m,grid)
+
+    # Try setting the current cell to 0.
+    count = 0
+    for value in (0,1):
+        grid[row][col] = value
+        if check_constraints(grid, constraints_set) != 0 :
+            count += how_many_helper(row, col + 1,constraints_set,n,m,grid)
+
+
+     # If none of the above worked, backtrack.
+    grid[row][col] = -1
+    return count
 
 def generate_puzzle(picture: Picture) -> Set[Constraint]:
     ...
